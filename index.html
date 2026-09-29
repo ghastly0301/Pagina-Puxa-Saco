@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout – Curso de Puxa Saco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #1a1d23;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --primary: #16a34a;
+    --primary-dark: #15803d;
+    --accent: #f59e0b;
+    --error: #dc2626;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .topbar {
+    background: #111827;
+    color: #fff;
+    text-align: center;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .topbar strong { color: var(--accent); }
+  .container {
+    max-width: 1040px;
+    margin: 32px auto;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 13px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .section + .section { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--border); }
+  .field { margin-bottom: 14px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 15px;
+    background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(22,163,74,.15);
+  }
+  input.invalid { border-color: var(--error); }
+  .error-msg { color: var(--error); font-size: 12px; margin-top: 4px; display: none; }
+  input.invalid + .error-msg { display: block; }
+
+  .methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+  .method {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 8px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    background: #fff;
+    transition: border-color .15s, background .15s;
+  }
+  .method span { display: block; font-size: 22px; margin-bottom: 4px; }
+  .method.active { border-color: var(--primary); background: #f0fdf4; color: var(--primary-dark); }
+  .method input { display: none; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .info-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 14px;
+    color: #166534;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 16px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font: inherit;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background .15s, transform .05s;
+  }
+  .btn:hover { background: var(--primary-dark); }
+  .btn:active { transform: scale(.99); }
+  .btn:disabled { opacity: .6; cursor: wait; }
+  .secure { text-align: center; color: var(--muted); font-size: 13px; margin-top: 12px; }
+
+  .summary { position: sticky; top: 24px; }
+  .product-cover {
+    height: 150px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1e3a8a, #7c3aed);
+    color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 16px;
+  }
+  .product-cover .emoji { font-size: 40px; }
+  .product-cover .name { font-weight: 800; font-size: 20px; letter-spacing: .3px; }
+  .desc { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .desc p + p { margin-top: 8px; }
+  .benefits { list-style: none; font-size: 14px; margin-bottom: 18px; }
+  .benefits li { padding: 4px 0; }
+  .benefits li::before { content: "✓ "; color: var(--primary); font-weight: 700; }
+  .total {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-top: 1px dashed var(--border);
+    padding-top: 16px;
+  }
+  .total .label { font-weight: 600; }
+  .total .price { font-size: 28px; font-weight: 800; color: var(--primary-dark); }
+  .guarantee {
+    margin-top: 16px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    color: #92400e;
+  }
+
+  .success { text-align: center; padding: 40px 24px; }
+  .success .icon { font-size: 56px; }
+  .success h2 { justify-content: center; font-size: 24px; margin: 12px 0 8px; }
+
+  @media (max-width: 860px) {
+    .container { grid-template-columns: 1fr; margin-top: 16px; }
+    .summary { position: static; order: -1; }
+  }
+  @media (max-width: 480px) {
+    .row { grid-template-columns: 1fr; }
+    .card { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">🔥 Oferta especial: acesso completo por apenas <strong>R$ 15,90</strong></div>
+
+<main class="container">
+  <form id="checkout" class="card" novalidate>
+    <div class="section">
+      <h2><span class="step">1</span> Seus dados</h2>
+      <div class="field">
+        <label for="nome">Nome completo</label>
+        <input id="nome" name="nome" autocomplete="name" placeholder="Seu nome completo" required>
+        <div class="error-msg">Informe seu nome completo.</div>
+      </div>
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+        <div class="error-msg">Informe um e-mail válido. O acesso ao curso será enviado para ele.</div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="cpf">CPF</label>
+          <input id="cpf" name="cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" required>
+          <div class="error-msg">CPF inválido.</div>
+        </div>
+        <div class="field">
+          <label for="telefone">Celular (WhatsApp)</label>
+          <input id="telefone" name="telefone" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15" required>
+          <div class="error-msg">Informe um celular válido.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="step">2</span> Pagamento</h2>
+      <div class="methods" role="radiogroup" aria-label="Forma de pagamento">
+        <label class="method active"><input type="radio" name="metodo" value="pix" checked><span>⚡</span>Pix</label>
+        <label class="method"><input type="radio" name="metodo" value="cartao"><span>💳</span>Cartão</label>
+        <label class="method"><input type="radio" name="metodo" value="boleto"><span>📄</span>Boleto</label>
+      </div>
+
+      <div class="panel active" data-panel="pix">
+        <div class="info-box">
+          <strong>Aprovação imediata.</strong> Ao finalizar, você receberá o QR Code e o código Pix copia e cola. O acesso é liberado assim que o pagamento for confirmado.
+        </div>
+      </div>
+
+      <div class="panel" data-panel="cartao">
+        <!-- Os campos do cartão devem ser renderizados/tokenizados pelo SDK do gateway
+             (ex.: Mercado Pago Card Payment Brick, Stripe Elements, Pagar.me Checkout).
+             Nunca envie o número do cartão para o seu próprio servidor. -->
+        <div id="card-container" class="info-box">
+          Pagamento em cartão de crédito em <strong>1x de R$ 15,90</strong>. Os dados do cartão serão preenchidos em ambiente seguro do processador de pagamento.
+        </div>
+      </div>
+
+      <div class="panel" data-panel="boleto">
+        <div class="info-box">
+          O boleto vence em 3 dias úteis e a compensação pode levar até 2 dias úteis após o pagamento. O acesso é liberado após a confirmação.
+        </div>
+      </div>
+
+      <button class="btn" type="submit" id="btn-pagar">Finalizar compra – R$ 15,90</button>
+      <p class="secure">🔒 Pagamento 100% seguro · Seus dados estão protegidos</p>
+    </div>
+  </form>
+
+  <aside class="card summary">
+    <div class="product-cover">
+      <div class="emoji">🤝</div>
+      <div class="name">Curso de Puxa Saco</div>
+    </div>
+    <div class="desc">
+      <p>No Curso de Puxa Saco, irei te ensinar como se destacar no trabalho e lidar com pessoas e situações, para finalmente colher os frutos de ser um bom profissional.</p>
+      <p>Além disso, todas as estratégias compartilhadas nesse curso também servirão para todas as áreas de sua vida, como família, amigos, colegas e clientes.</p>
+    </div>
+    <ul class="benefits">
+      <li>Destaque-se no trabalho</li>
+      <li>Aprenda a lidar com pessoas e situações</li>
+      <li>Estratégias para família, amigos e clientes</li>
+      <li>Acesso imediato após a confirmação</li>
+    </ul>
+    <div class="total">
+      <span class="label">Total</span>
+      <span class="price">R$ 15,90</span>
+    </div>
+    <div class="guarantee">🛡️ <strong>Garantia de 7 dias.</strong> Se não gostar, devolvemos seu dinheiro, conforme o Código de Defesa do Consumidor.</div>
+  </aside>
+</main>
+
+<script>
+  const PRODUTO = { nome: "Curso de Puxa Saco", preco: 15.90 };
+
+  const $ = (s) => document.querySelector(s);
+  const onlyDigits = (v) => v.replace(/\D/g, "");
+
+  // Máscaras
+  $("#cpf").addEventListener("input", (e) => {
+    const d = onlyDigits(e.target.value).slice(0, 11);
+    e.target.value = d
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  });
+  $("#telefone").addEventListener("input", (e) => {
+    const d = onlyDigits(e.target.value).slice(0, 11);
+    e.target.value = d
+      .replace(/^(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{5})(\d{1,4})$/, "$1-$2");
+  });
+
+  // Validações
+  function cpfValido(cpf) {
+    cpf = onlyDigits(cpf);
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+    for (const t of [9, 10]) {
+      let soma = 0;
+      for (let i = 0; i < t; i++) soma += Number(cpf[i]) * (t + 1 - i);
+      const dv = ((soma * 10) % 11) % 10;
+      if (dv !== Number(cpf[t])) return false;
+    }
+    return true;
+  }
+  const regras = {
+    nome: (v) => v.trim().split(/\s+/).length >= 2,
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
+    cpf: cpfValido,
+    telefone: (v) => onlyDigits(v).length >= 10,
+  };
+  function validar() {
+    let ok = true;
+    for (const [id, regra] of Object.entries(regras)) {
+      const el = document.getElementById(id);
+      const valido = regra(el.value);
+      el.classList.toggle("invalid", !valido);
+      if (!valido && ok) { el.focus(); ok = false; }
+    }
+    return ok;
+  }
+  Object.keys(regras).forEach((id) =>
+    document.getElementById(id).addEventListener("blur", (e) => {
+      if (e.target.value) e.target.classList.toggle("invalid", !regras[id](e.target.value));
+    })
+  );
+
+  // Troca de forma de pagamento
+  document.querySelectorAll('input[name="metodo"]').forEach((radio) =>
+    radio.addEventListener("change", () => {
+      document.querySelectorAll(".method").forEach((m) =>
+        m.classList.toggle("active", m.contains(radio) && radio.checked));
+      document.querySelectorAll(".panel").forEach((p) =>
+        p.classList.toggle("active", p.dataset.panel === radio.value));
+    })
+  );
+
+  // Envio
+  $("#checkout").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!validar()) return;
+
+    const btn = $("#btn-pagar");
+    btn.disabled = true;
+    btn.textContent = "Processando...";
+
+    const pedido = {
+      produto: PRODUTO.nome,
+      valor: PRODUTO.preco,
+      metodo: document.querySelector('input[name="metodo"]:checked').value,
+      cliente: {
+        nome: $("#nome").value.trim(),
+        email: $("#email").value.trim(),
+        cpf: onlyDigits($("#cpf").value),
+        telefone: onlyDigits($("#telefone").value),
+      },
+    };
+
+    try {
+      await processarPagamento(pedido);
+      mostrarSucesso(pedido);
+    } catch (err) {
+      alert("Não foi possível processar o pagamento. Tente novamente.");
+      btn.disabled = false;
+      btn.textContent = "Finalizar compra – R$ 15,90";
+    }
+  });
+
+  // PONTO DE INTEGRAÇÃO: substitua pela chamada ao seu backend/gateway
+  // (Mercado Pago, Stripe, Pagar.me, Asaas, Hotmart, Kiwify...).
+  // O valor deve ser definido no servidor, nunca confiando no preço enviado pelo navegador.
+  async function processarPagamento(pedido) {
+    console.log("Pedido:", pedido);
+    return new Promise((r) => setTimeout(r, 1200));
+  }
+
+  function mostrarSucesso(pedido) {
+    const msgs = {
+      pix: "Seu código Pix foi gerado. Após o pagamento, o acesso chega no seu e-mail.",
+      cartao: "Pagamento aprovado! O acesso ao curso foi enviado para o seu e-mail.",
+      boleto: "Seu boleto foi gerado e enviado para o seu e-mail.",
+    };
+    $("#checkout").innerHTML = `
+      <div class="success">
+        <div class="icon">🎉</div>
+        <h2>Pedido realizado, ${pedido.cliente.nome.split(" ")[0].replace(/[<>&"]/g, "")}!</h2>
+        <p>${msgs[pedido.metodo]}</p>
+        <p class="secure">Enviado para: ${pedido.cliente.email.replace(/[<>&"]/g, "")}</p>
+      </div>`;
+  }
+</script>
+</body>
+</html>
